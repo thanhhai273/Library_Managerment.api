@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.restapi.model.Book;
 import com.restapi.JpaRepository.BookRepository;
-import com.restapi.JpaRepository.BRepository;
 
 @RestController
 @RequestMapping("/api")
@@ -23,8 +22,7 @@ import com.restapi.JpaRepository.BRepository;
 public class BookController {
 	@Autowired
 	BookRepository bookRepository;
-	@Autowired
-	BRepository bRepository;
+	
 	// liet ke tat ca cac sach
 	@RequestMapping(value = "/books/", method = RequestMethod.GET)
 	public ResponseEntity<List<Book>> listAllBook() {
@@ -54,7 +52,7 @@ public class BookController {
 	// cap nhat thong tin sach
 	@RequestMapping(value = "/books/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<Book> updateBook(@PathVariable("id") Long bookId, @Valid @RequestBody Book bookDetail) {
-		Book book =   bRepository.getOne(bookId);
+		Book book =   bookRepository.getOne(bookId);
 		if (book == null) {
 			return ResponseEntity.notFound().build();
 		}
@@ -66,7 +64,7 @@ public class BookController {
 		book.setQuantity(bookDetail.getQuantity());
 		book.setPublishing(bookDetail.getPublishing());
 
-		Book updateBook = bRepository.save(book);
+		Book updateBook = bookRepository.save(book);
 		return ResponseEntity.ok(updateBook);
 
 	}
@@ -74,13 +72,14 @@ public class BookController {
 	// Xoa sach
 	@RequestMapping(value = "/books/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<Book> deleteContact(@PathVariable(value = "id") Long id) {
-		Book book = bRepository.getOne(id);
+		Book book = bookRepository.getOne(id);
 	    if(book == null) {
 	        return ResponseEntity.notFound().build();
 	    }
 
-	    bRepository.delete(book);
+	    bookRepository.delete(book);
 	    return ResponseEntity.ok().build();
 	}
 
 }
+
