@@ -2,11 +2,16 @@ package com.restapi.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -26,7 +31,7 @@ public class Author implements Serializable{
 	private int age;
 	private Long phone;
 	private String email;
-	
+	private int numberOfBook;
 	@Id
     @GeneratedValue(strategy=GenerationType.AUTO)
 	private long id;
@@ -34,14 +39,23 @@ public class Author implements Serializable{
 		id=0;
 	}
 	
-	public Author(int id, String name, Date birth, int age, Long phone, String email ) {
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name = "author_book",
+			joinColumns = @JoinColumn(name= "authorId", referencedColumnName = "id"),
+			inverseJoinColumns = @JoinColumn(name="bookId", referencedColumnName = "id"))
+	 @JsonIgnoreProperties("authors")
+	//@JsonManagedReference
+	
+	private Set<Book> books ;
+	
+	public Author(int id, String name, Date birth, int age, Long phone, String email, int numberOfBook ) {
 		this.id=id;
 		this.name=name;
 		this.birth=birth;
 		this.age=age;
 		this.phone=phone;
 		this.email=email;
-		
+		this.numberOfBook=numberOfBook;
 	}
 
 	public String getName() {
@@ -91,5 +105,22 @@ public class Author implements Serializable{
 	public void setId(long id) {
 		this.id = id;
 	}
+	public Set<Book> getBooks() {
+		return books;
+	}
+	public void setBooks(Set<Book> books) {
+		this.books = books;
+	}
+
+	public int getNumberOfBook() {
+		return numberOfBook;
+	}
+
+	public void setNumberOfBook(int numberOfBook) {
+		this.numberOfBook = numberOfBook;
+	}
+
 	
+		
 }
+
