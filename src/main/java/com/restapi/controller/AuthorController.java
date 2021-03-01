@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.restapi.model.Author;
 import com.restapi.JpaRepository.AuthorRepository;
-import com.restapi.JpaRepository.ARepository;
+import com.restapi.JpaRepository.BookRepository;
 
 @RestController
 @RequestMapping("/api")
@@ -25,16 +25,21 @@ public class AuthorController {
 	@Autowired
 	AuthorRepository authorRepository;
 	@Autowired
-	ARepository aRepository;
+	BookRepository bookRepository;
+
+//	@PostMapping
+//    public Author updateAuthor(@RequestBody Author author, @RequestBody BookRepository book) {
+//        return Service.updateAuthor(author, book);
+//    }
 
 	// liet ke tat ca tac gia
 	@RequestMapping(value = "/authors/", method = RequestMethod.GET)
 	public ResponseEntity<List<Author>> listAllContact() {
-		List<Author> listContact = (List<Author>) authorRepository.findAll();
-		if (listContact.isEmpty()) {
+		List<Author> listAuthor = (List<Author>) authorRepository.findAll();
+		if (listAuthor.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
-		return new ResponseEntity<List<Author>>(listContact, HttpStatus.OK);
+		return new ResponseEntity<List<Author>>(listAuthor, HttpStatus.OK);
 	}
 
 	// tim kiem tac gia
@@ -47,6 +52,16 @@ public class AuthorController {
 		return searchAuthor;
 	}
 
+	// Tim sach theo authorId;
+	@RequestMapping(value = "/authors/find/{id}", method = RequestMethod.GET)
+	public Author findBook(@PathVariable Long id) {
+		Author searchBook = authorRepository.getOne(id);
+		if (searchBook == null) {
+			ResponseEntity.notFound().build();
+		}
+		return searchBook;
+	}
+
 	// them tac gia
 	@RequestMapping(value = "/authors/", method = RequestMethod.POST)
 	public Author addAuthor(@Valid @RequestBody Author author) {
@@ -57,31 +72,32 @@ public class AuthorController {
 	@RequestMapping(value = "/authors/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<Author> updateAuthor(@PathVariable(value = "id") Long authorId,
 			@Valid @RequestBody Author authorDetail) {
-		Author author = aRepository.getOne(authorId);
+		Author author = authorRepository.getOne(authorId);
 		if (author == null) {
 			return ResponseEntity.notFound().build();
 		}
-		
+
 		author.setName(authorDetail.getName());
 		author.setAge(authorDetail.getAge());
 		author.setBirth(authorDetail.getBirth());
 		author.setPhone(authorDetail.getPhone());
 		author.setEmail(authorDetail.getEmail());
 
-		Author updatedAuthor = aRepository.save(author);
+		Author updatedAuthor = authorRepository.save(author);
 		return ResponseEntity.ok(updatedAuthor);
 	}
 
 	// xoa tac gia
 	@RequestMapping(value = "/authors/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<Author> deleteContact(@PathVariable(value = "id") Long authorId) {
-		Author author = aRepository.getOne(authorId);
+		Author author = authorRepository.getOne(authorId);
 		if (author == null) {
 			return ResponseEntity.notFound().build();
 		}
 
-		aRepository.delete(author);
+		authorRepository.delete(author);
 		return ResponseEntity.ok().build();
 	}
 
 }
+
