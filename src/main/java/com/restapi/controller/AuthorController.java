@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.restapi.model.Author;
 import com.restapi.JpaRepository.AuthorRepository;
 import com.restapi.JpaRepository.BookRepository;
+import com.restapi.JpaRepository.NumberOfBook;
 
 @RestController
 @RequestMapping("/api")
@@ -27,15 +28,12 @@ public class AuthorController {
 	@Autowired
 	BookRepository bookRepository;
 
-//	@PostMapping
-//    public Author updateAuthor(@RequestBody Author author, @RequestBody BookRepository book) {
-//        return Service.updateAuthor(author, book);
-//    }
-
 	// liet ke tat ca tac gia
 	@RequestMapping(value = "/authors/", method = RequestMethod.GET)
 	public ResponseEntity<List<Author>> listAllContact() {
+		
 		List<Author> listAuthor = (List<Author>) authorRepository.findAll();
+	
 		if (listAuthor.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
@@ -46,6 +44,7 @@ public class AuthorController {
 	@RequestMapping(value = "/authors/{name}", method = RequestMethod.GET)
 	public List<Author> findBook(@PathVariable String name) {
 		List<Author> searchAuthor = (List<Author>) authorRepository.findByName(name);
+		
 		if (searchAuthor == null) {
 			ResponseEntity.notFound().build();
 		}
@@ -56,6 +55,13 @@ public class AuthorController {
 	@RequestMapping(value = "/authors/find/{id}", method = RequestMethod.GET)
 	public Author findBook(@PathVariable Long id) {
 		Author searchBook = authorRepository.getOne(id);
+		//lay numberOfBook theo id
+		List<NumberOfBook> Response = (List<NumberOfBook>) bookRepository.findAllBy(id);
+		for(NumberOfBook numberOfBook : Response) {
+			searchBook.setNumberOfBook( numberOfBook.getNumberOfBook());
+		}
+		authorRepository.save(searchBook);
+
 		if (searchBook == null) {
 			ResponseEntity.notFound().build();
 		}
@@ -100,4 +106,6 @@ public class AuthorController {
 	}
 
 }
+
+
 
